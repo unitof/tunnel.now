@@ -42,7 +42,7 @@ const main = async () => {
   console.log(`tunnel.now host has been deployed to ${hostname}`);
   alias = alias ? alias : userSettings.get('defaultAlias')
   if (alias) {
-    console.log(`setting alias "${alias}"...\n`);
+    console.log(`Setting alias "${alias}"...\n`);
     await runEcho("now", "alias", "set", hostname, alias);
     console.log("");
   }
