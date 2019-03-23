@@ -17,33 +17,29 @@ const {
 } = require("./codec");
 
 
-let { _: [ remoteHostname, localPort ] } = yargs
-  .usage('tunnel.now <remote-hostname> <local-port>')
+let { hostname, port } = yargs
+  .usage('$0 --host <remote-hostname> --port <local-port>')
+  .alias('h', 'hostname')
+  .default('h', userSettings.get('defaultAlias'))
+  .alias('p', 'port')
+  .default('p', userSettings.get('defaultPort'))
+  .demandOption(['h', 'p'])
   .help()
   .argv;
+  // yargs is smart with defaults: if undefined, it's not set
 
-if (!remoteHostname) {
-  if (userSettings.has('defaultAlias')) {
-    console.log(`Using defaultAlias https://${userSettings.get('defaultAlias')}`);
-    remoteHostname = 'https://' + userSettings.get('defaultAlias')
-  } else {
-    console.error("You must supply a name for a remote host, listening on port 443.");
-    process.exit(1);
-  }
+if (!hostname) {
+  console.error("You must supply a name for a remote host, listening on port 443.");
+  process.exit(1);
 }
-if (!localPort) {
-  if (userSettings.has('defaultPort')) {
-    console.log(`Using defaultPort ${userSettings.get('defaultPort')}`);
-    localPort = userSettings.get('defaultPort')
-  } else {
-    console.error("You must indicate which local port that requests should be forwarded to.");
-    process.exit(1);
-  }
+if (!port) {
+  console.error("You must indicate which local port that requests should be forwarded to.");
+  process.exit(1);
 }
 
-const baseTargetUrl = `http://localhost:${localPort}`;
+const baseTargetUrl = `http://localhost:${port}`;
 
-const uri = `wss://${remoteHostname}:443`;
+const uri = `wss://https://${hostname}:443`;
 const socket = new WebSocket(uri);
 
 socket.addEventListener("open", () => {
