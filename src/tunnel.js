@@ -5,7 +5,7 @@ const WebSocket = require("ws");
 const { default: fetch, Headers } = require("node-fetch");
 
 const Configstore = require('configstore');
-const userSettings = new Configstore('tunnow');
+const userSettings = new Configstore('tunnow'); // does not create file until first key is set
 // {
 //   defaultAlias: <url, no https://>,
 //   defaultPort: <port number>,
@@ -17,18 +17,28 @@ const {
 } = require("./codec");
 
 
-const { _: [ remoteHostname, localPort ] } = yargs
+let { _: [ remoteHostname, localPort ] } = yargs
   .usage('tunnel.now <remote-hostname> <local-port>')
   .help()
   .argv;
 
 if (!remoteHostname) {
-  console.error("You must supply a name for a remote host, listening on port 443.");
-  process.exit(1);
+  if (userSettings.has('defaultAlias')) {
+    console.log(`Using defaultAlias https://${userSettings.get('defaultAlias')}`);
+    remoteHostname = 'https://' + userSettings.get('defaultAlias')
+  } else {
+    console.error("You must supply a name for a remote host, listening on port 443.");
+    process.exit(1);
+  }
 }
 if (!localPort) {
-  console.error("You must indicate which local port that requests should be forwarded to.");
-  process.exit(1);
+  if (userSettings.has('defaultPort')) {
+    console.log(`Using defaultPort ${userSettings.get('defaultPort')}`);
+    localPort = userSettings.get('defaultPort')
+  } else {
+    console.error("You must indicate which local port that requests should be forwarded to.");
+    process.exit(1);
+  }
 }
 
 const baseTargetUrl = `http://localhost:${localPort}`;

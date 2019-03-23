@@ -6,7 +6,7 @@ const execa = require("execa");
 const yargs = require("yargs");
 
 const Configstore = require('configstore');
-const userSettings = new Configstore('tunnow');
+const userSettings = new Configstore('tunnow'); // does not create file until first key is set
 // {
 //   defaultAlias: <url, no https://>,
 //   defaultPort: <port number>,
@@ -32,7 +32,7 @@ const runEcho = (...cmd) => {
 };
 
 const main = async () => {
-  const { _: [ alias ] } = yargs
+  let { _: [ alias ] } = yargs
     .usage('tunnel.deploy [alias]')
     .help()
     .argv;
@@ -40,6 +40,7 @@ const main = async () => {
   const { stdout: deployedUrl } = await run("now", "deploy", "-V", "1");
   const hostname = deployedUrl.replace(/https?:\/\//, "");
   console.log(`tunnel.now host has been deployed to ${hostname}`);
+  alias = alias ? alias : userSettings.get('defaultAlias')
   if (alias) {
     console.log(`setting alias "${alias}"...\n`);
     await runEcho("now", "alias", "set", hostname, alias);
