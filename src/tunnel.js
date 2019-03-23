@@ -4,6 +4,13 @@ const yargs = require("yargs");
 const WebSocket = require("ws");
 const { default: fetch, Headers } = require("node-fetch");
 
+const Configstore = require('configstore');
+const userSettings = new Configstore('tunnow');
+// {
+//   defaultAlias: <url, no https://>,
+//   defaultPort: <port number>,
+// }
+
 const {
   request: { decode: decodeRequest },
   response: { encode: encodeResponse }

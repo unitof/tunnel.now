@@ -5,6 +5,12 @@ const path = require("path");
 const execa = require("execa");
 const yargs = require("yargs");
 
+const Configstore = require('configstore');
+const userSettings = new Configstore('tunnow');
+// {
+//   defaultAlias: <url, no https://>,
+//   defaultPort: <port number>,
+// }
 
 const tunnelNowPath = path.resolve(__dirname, "..");
 
